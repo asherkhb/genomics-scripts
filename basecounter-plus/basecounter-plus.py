@@ -1,8 +1,9 @@
 """
-	BaseCounter Plus v. 1.2.0
+	BaseCounter Plus v. 1.2.1
 	
 		Input (at prompt) a multi-fasta file:
 			Output a file (output.txt) with the following information:
+				Total # of Features
 				Total File Individual Base Count
 				Total Bases, including special charactars
 				Total Amino Acids G, C, A and T
@@ -133,6 +134,7 @@ out_file = open('output.txt', 'w')
 
 #Print Total Base Library
 out_file.write("~~~~~Total Base Library:~~~~~\n\n")
+out_file.write("Total Features: %s\n" % (feat_count))
 out_file.write("Total Base Count: %s\n" % (str(lib_total)))
 out_file.write("Total Nucleotide Count: %s\n" % (str(total)))
 for key,value in base_count.items():
