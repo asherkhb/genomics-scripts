@@ -1,18 +1,18 @@
 """
-	BaseCounter Plus v. 1.1.1
+	BaseCounter Plus v. 1.2.0
 	
-		Given a multi-fasta file: 
+		Input (at prompt) a multi-fasta file:
 			Output a file (output.txt) with the following information:
 				Total File Individual Base Count
 				Total Bases, including special charactars
 				Total Amino Acids G, C, A and T
 				Total File Percent GC
 				Total File Percent AT
-				List of Included Features
+				List of Included Features with Total Base Count and PercentGC/PercentAT Statistics
 		
 		Future: 
-			Accept command line arguments for input and output file
-			Provide statistics on each individual feature
+			Change input prompt to command line arguments for input and output file
+			Include additional statistics
 		
 		Test Data Included: multifasta file of 37 various features
 	
@@ -70,10 +70,46 @@ def WritePercent(i):
 	s = str(i) + "%\n"
 	out_file.write(s)
 
+def FastaSplit(input):
+	dictionary = {}
+	index = ''
+	with open(input, 'r') as in_file:
+		for line in in_file:
+			if line[0] == '>':
+				dictionary[line.rstrip('\n')] = []
+				index = line.rstrip('\n')
+			elif line[0] != '>':
+				dictionary[index].append(line.rstrip('\n'))
+	return dictionary
+
+def FeatSplit(d):
+	for key,value in d.items():
+		feature = key
+		bcount = {}
+		for i in range(len(value)):
+			s = value[i]
+			for x in range(len(s)):
+				if s[x] not in bcount:
+					bcount[s[x]] = 0
+				bcount[s[x]] += 1
+		totalNT = bcount['G'] + bcount['C'] + bcount['A'] + bcount['T']
+		gc = PercentPair(bcount['G'], bcount['C'], totalNT)
+		at = PercentPair(bcount['A'], bcount['T'], totalNT)
+		out_file.write("%s: \n" % (feature))
+		out_file.write("  Total Nucleotides: %s\n" % (totalNT))
+		out_file.write("  Percent GC:"),
+		WritePercent(gc)
+		out_file.write("  Percent AT:"),
+		WritePercent(at)
+		out_file.write("\n")
+
+"""Get Input File"""
+inpt = raw_input("Enter MultiFasta File Name: ")
+
 """Data Processing"""		
 
 #Pull base_count dictionary and fast_list list from BaseLibBuilder
-base_count,fasta_list,_ = BaseLibBuilder('sample_fasta.txt')
+base_count,fasta_list,_ = BaseLibBuilder(inpt)
 
 #Calculate Library Total
 lib_total = LibSum(base_count)
@@ -96,47 +132,30 @@ feat_count = str(len(fasta_list))
 out_file = open('output.txt', 'w')
 
 #Print Total Base Library
-out_file.write("Total Base Library:\n")
-out_file.write("    Total Base Count: %s\n" % (str(lib_total)))
-out_file.write("    Total Amino Acid Count: %s\n" % (str(total)))
+out_file.write("~~~~~Total Base Library:~~~~~\n\n")
+out_file.write("Total Base Count: %s\n" % (str(lib_total)))
+out_file.write("Total Nucleotide Count: %s\n" % (str(total)))
 for key,value in base_count.items():
-	out_file.write("    %s: %s\n" % (key,str(value)))
+	out_file.write("  %s: %s\n" % (key,str(value)))
 
 out_file.write("\n")
 
 #Write Total Library Composition Statistics
-out_file.write("Total Library Composition Statistics:\n  *Calculated on total AA content*\n")
-out_file.write("    %GC: ")
+out_file.write("Total Composition Statistics:\n")
+out_file.write("  %GC: ")
 WritePercent(gc)
-out_file.write("    %AT: ")
+out_file.write("  %AT: ")
 WritePercent(at)
 
 out_file.write("\n")
+out_file.write("~~~~~Included Features~~~~~\n\n")
 
-#Write Feature List
-out_file.write("Feature List: (%s)\n" % (feat_count))
-for i in range(len(fasta_list)):
-	out_file.write("    %s\n" % (fasta_list[i]))
+#Write Feature List w/ Statistics
+d = FastaSplit(inpt)
+FeatSplit(d)
 
 #Close Output File
 out_file.close()
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#Print Confirmation to Console
+print("...\n'%s' Analyzed! See 'output.txt' for results..." % (inpt))
