@@ -1,19 +1,23 @@
 """
-	BaseCounter Plus v. 1.1.0
-	Given a multi-fasta file: 
-		Output a file (output.txt) with the following information:
-			Total File Individual Base Count
-			Total Bases, including special charactars
-			Total Amino Acids G, C, A and T
-			Total File Percent GC
-			Total File Percent AT
-			List of Included Features
-	Future: 
-		Accept command line arguments for input and output file
-		Provide statistics on each individual feature
-
-		By asherkhb
-		Last Update: 8/2/14
+	BaseCounter Plus v. 1.1.1
+	
+		Given a multi-fasta file: 
+			Output a file (output.txt) with the following information:
+				Total File Individual Base Count
+				Total Bases, including special charactars
+				Total Amino Acids G, C, A and T
+				Total File Percent GC
+				Total File Percent AT
+				List of Included Features
+		
+		Future: 
+			Accept command line arguments for input and output file
+			Provide statistics on each individual feature
+		
+		Test Data Included: multifasta file of 37 various features
+	
+	By asherkhb
+	Last Update: 10/2/14
 """
 
 """Define Functions"""
@@ -45,18 +49,6 @@ def BaseLibBuilder(filename):
 	if in_file.closed == False:
 		in_file.close()
 	return base_count, fasta_list, lines
-
-def FastSplit(filename):
-	feat_dict = {}
-	index = ''
-	with open(input, 'r') as in_file:
-		for line in in_file:
-			if line[0] == '>':
-				feat_dict[line.rstrip('\n')] = []
-				index = line.rstrip('\n')
-			elif line[0] != '>':
-				feat_dict[index].append(line.rstrip('\n'))
-	return feat_dict
 
 def LibSum(library):
 	count = 0
@@ -112,6 +104,7 @@ for key,value in base_count.items():
 
 out_file.write("\n")
 
+#Write Total Library Composition Statistics
 out_file.write("Total Library Composition Statistics:\n  *Calculated on total AA content*\n")
 out_file.write("    %GC: ")
 WritePercent(gc)
@@ -120,8 +113,30 @@ WritePercent(at)
 
 out_file.write("\n")
 
-out_file.write("Features: (%s)\n" % (feat_count))
+#Write Feature List
+out_file.write("Feature List: (%s)\n" % (feat_count))
 for i in range(len(fasta_list)):
 	out_file.write("    %s\n" % (fasta_list[i]))
 
+#Close Output File
 out_file.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
