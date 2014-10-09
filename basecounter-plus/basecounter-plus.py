@@ -1,5 +1,5 @@
 """
-	BaseCounter Plus v. 1.2.1
+	BaseCounter Plus v. 1.2.2
 	
 		Input (at prompt) a multi-fasta file:
 			Output a file (output.txt) with the following information:
@@ -9,7 +9,7 @@
 				Total Amino Acids G, C, A and T
 				Total File Percent GC
 				Total File Percent AT
-				List of Included Features with Total Base Count and PercentGC/PercentAT Statistics
+				List of Included Features (Alphabetical) with Total Base Count and PercentGC/PercentAT Statistics
 		
 		Future: 
 			Change input prompt to command line arguments for input and output file
@@ -18,7 +18,7 @@
 		Test Data Included: multifasta file of 37 various features
 	
 	By asherkhb
-	Last Update: 10/2/14
+	Last Update: 10/9/14
 """
 
 """Define Functions"""
@@ -84,7 +84,7 @@ def FastaSplit(input):
 	return dictionary
 
 def FeatSplit(d):
-	for key,value in d.items():
+	for key,value in sorted(d.items()):
 		feature = key
 		bcount = {}
 		for i in range(len(value)):
