@@ -2,6 +2,7 @@ __author__ = 'asherkhb'
 
 import os
 import shutil
+import sys
 
 
 def generate_summary(final_dictionary):
@@ -9,9 +10,9 @@ def generate_summary(final_dictionary):
 
     Using the final 'categories' dictionary, generates a full summary report.
     Report contains each category and number of associated files and a list of each file, plus...
-    Total number of entries, number of unique species, and a species list for each file
+    Total number of entries, number of unique species, and a species list for each file.
 
-    :param final_dictionary: Final 'categories' dictionary
+    :param final_dictionary: Final 'categories' dictionary.
     """
     otpt = open('multifind_summary.txt', 'w')
     for cat in final_dictionary:
@@ -37,9 +38,9 @@ def generate_summary(final_dictionary):
 def generate_simple_report(final_dictionary):
     """Generate a simple summary report.
 
-    Using final categories dictionary, generates a simple summary report (category and number of associated files)
+    Using final categories dictionary, generates a simple summary report (category and number of associated files).
 
-    :param final_dictionary: Final 'categories' dictionary
+    :param final_dictionary: Final 'categories' dictionary.
     """
     otpt = open('multifind_simple_summary.txt', 'w')
     for cat in final_dictionary:
@@ -50,14 +51,35 @@ def generate_simple_report(final_dictionary):
     otpt.close()
 
 
+def generate_folder_summaries(final_dictionary):
+    """Generates summaries of each file contained in each folder.
+
+    :param final_dictionary: Final "categories" dictionary.
+    """
+    for cat in final_dictionary:
+        if len(cat[1]) == 0:
+            pass
+        else:
+            category_name = cat[0]
+            summary_path = "./%s/summary.txt" % category_name
+            with open(summary_path, 'w') as sumry:
+                for match_file in cat[1]:
+                    sumry.write(match_file[0] + '\n')
+
+#Check for correct number of arguments.
+if len(sys.argv) != 2:
+    print("Incorrect usage syntax: Must specify max species number.\nUse 'multifind.py <max_spp>'")
+    exit()
+
 #Establish FASTA-containing directory, build list of contents.
-directory = './sample_fastas/'  # Use trailing forward slash.
+directory = './'  # Use trailing forward slash.
 file_list = os.listdir(directory)
+max_spp = sys.argv[1]
 
 #Generate Directories
 categories = [['species_specific', []],       # 1 Unique Taxa: categoryID: 0
-              ['poorly_conserved', []],       # 2-4 Unique Taxa: categoryID: 1
-              ['moderately_conserved', []],   # 4 - (total-1) taxa: categoryID: 2
+              ['poorly_conserved', []],       # 2 <= x < 4 Unique Taxa: categoryID: 1
+              ['moderately_conserved', []],   # >= 4 <= species <= (Max-1) taxa: categoryID: 2
               ['completely_conserved', []]]   # All unique taxa: categoryID: 3
 
 
@@ -94,7 +116,7 @@ for fasta_file in file_list:
         #Establish total number of species.
         species_number = len(species)
         #Generate an entry (for final categories dictionary) for the file.
-        file_entry = [file, entries, species_number, species]
+        file_entry = [fasta_file, entries, species_number, species]
 
         #Classify each FASTA by category, move file into appropriate category, and append category dictionary.
         #To change from copy to move, simply change the next 4 "copy2" to "move"
@@ -107,11 +129,11 @@ for fasta_file in file_list:
             categories[1][1].append(file_entry)
             shutil.copy2(file_path, './poorly_conserved')
         #Moderately Conserved.
-        elif species_number < entries:
+        elif max_spp > species_number >= 4:
             categories[2][1].append(file_entry)
             shutil.copy2(file_path, './moderately_conserved')
         #Completely Conserved.
-        elif species_number == entries:
+        elif species_number == max_spp:
             categories[3][1].append(file_entry)
             shutil.copy2(file_path, './completely_conserved')
 
@@ -120,3 +142,6 @@ generate_summary(categories)
 
 #Generate a simple report.
 generate_simple_report(categories)
+
+#Generate folder summaries.
+generate_folder_summaries(categories)
