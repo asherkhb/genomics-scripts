@@ -7,7 +7,6 @@ __author__ = 'asherkhb'
 # Merge close blast hits.
 #
 # Returns:
-#    - merge_close_hits_input_sorted.txt : Sorted version of input data.
 #    - sample-instance-report : List of ID's and number of times they occur
 #    - <output> : Merged input file.
 
@@ -173,6 +172,7 @@ with open('scriptpy-temp-out.txt', 'r') as inpt, open(output_file, 'w') as otpt:
 
 #Remove the temporary output file
 remove("scriptpy-temp-out.txt")
+remove(input_file_sorted)
 
 #Generate a report of IDs and and number of HSPs
 with open('sample-instance-report.txt', 'w') as instance_report:
