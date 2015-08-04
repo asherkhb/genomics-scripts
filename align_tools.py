@@ -5,6 +5,7 @@ __author__ = 'asherkhb'
 # '*' Indicate poor-quality, basically useless scripts
 #
 # Includes
+#   - species_with_data
 #   - fasta_align_to_list
 #   - condenser*
 #   - identity_calculator
@@ -12,6 +13,86 @@ __author__ = 'asherkhb'
 #   - generate_site-identity_tsv
 
 from sys import argv
+
+
+def species_with_data(msa, outputfile):
+    """Species with Data in an MSA
+    Determines which species possess sequence data in a MSA.
+    Usage: species_with_data(<MSA>) <output_file_name>
+       * outputfile will contain only those species which have sequence data.
+       * outputfile.csv will contain a table of species and their percent coverage over the sequence.
+
+    :param msa: Multiple sequence alignment in PhyLip format (.phy)
+    """
+    out_file = outputfile
+    file_summary = '%s_coverage.csv' % outputfile
+    first_line = True
+    spp_count = 0
+    seq_length = 0
+    data_points = {} # name:sequence key:value pairs
+    with open(msa, 'r') as inpt:
+        for line in inpt:
+
+            # Process data lines
+            if not first_line:
+                line_data = []
+                contents = line.split(' ')
+                for item in contents:
+                    item = item.strip('\n')
+                    line_data.append(item)
+
+                #Define name and sequence variables
+                name = line_data[0]
+                sequence = line_data[1]
+
+                presence = False
+                bases = 0
+                gaps = 0
+                for i in range(0, len(sequence)):
+                    if sequence[i] == '-':
+                        gaps += 1
+                    else:
+                        bases += 1
+                        presence = True
+
+                if presence:
+                    coverage = float(bases) / seq_length
+                    coverage = float("{0:.3f}".format(coverage))
+                    #Add entry into data_points dictionary.
+                    data_points[name] = {'seq':sequence, 'coverage':coverage}
+
+             # Process first line
+            else:
+                msa_info = []
+                contents = line.split(' ')
+                for item in contents:
+                    item = item.strip('\n')
+                    item = int(item)
+                    msa_info.append(item)
+
+                # Define species count and sequence length.
+                spp_count = msa_info[0]
+                seq_length = msa_info[1]
+
+                #End first line loop.
+                first_line = False
+
+    with open(msa, 'r') as inpt, open(out_file, 'w') as otpt, open(file_summary, 'w') as summary:
+        spp_number = len(data_points)
+        new_head = '%s %s\n' % (spp_number, seq_length)
+        otpt.write(new_head)
+        for line in inpt:
+            contents = line.split(' ')
+            if contents[0] in data_points:
+                #Write line to output file
+                otpt.write(line)
+
+                #Write summary entry
+                key = contents[0]
+                coverage = data_points[key]['coverage']
+                summary_entry = '%s,%s\n' % (key, coverage)
+                summary.write(summary_entry)
+
 
 def fasta_alignment_to_list(alignment_file):
     """FASTA-format MSA to List

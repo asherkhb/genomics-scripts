@@ -1,6 +1,6 @@
 __author__ = 'asherkhb'
 # Merge Close Hits
-# Version 2.0.0
+# Version 2.0.2
 #
 # From an input TSV (of BLAST hits, from evolinc pipeline)
 # Label top blast hit, sort by location, then by ID
@@ -62,14 +62,13 @@ with open(input_file, 'r') as inpt, open(input_file_sorted, 'w') as otpt:
         else:
             otpt.write(line)
 
-sorting_command = 'sort -k4 -k1 --output="%s" %s' % (input_file_sorted, input_file_sorted)
+sorting_command = 'sort -k41 --output="%s" %s' % (input_file_sorted, input_file_sorted)
 call(sorting_command, shell=True)
 
 
 #Combine Multiple Hits
 #Open input file and temporary output file
 with open(input_file_sorted, 'r') as inpt, open("scriptpy-temp-out.txt", 'w') as otpt:
-    #Establish a reading loop
     for line in inpt:
         #Skip empty lines
         if line == '\n':
@@ -110,12 +109,12 @@ with open(input_file_sorted, 'r') as inpt, open("scriptpy-temp-out.txt", 'w') as
                     #Append TBH to ID, if appropriate.
                     try:
                         line_memory_array[0] += line_memory_array[10]
-                        line_memory_array.remove(line_memory_array[10])
+                        del line_memory_array[10]
                     except IndexError:
                         pass
 
                     #Remove length variable
-                    line_memory_array.remove(line_memory_array[9])
+                    del line_memory_array[9]
 
                     #Join array into printable line, write to output.
                     printline = "\t".join(line_memory_array) + '\n'
@@ -130,12 +129,12 @@ with open(input_file_sorted, 'r') as inpt, open("scriptpy-temp-out.txt", 'w') as
                     #Append TBH to ID, if appropriate.
                     try:
                         line_memory_array[0] += line_memory_array[10]
-                        line_memory_array.remove(line_memory_array[10])
+                        del line_memory_array[10]
                     except IndexError:
                         pass
 
                     #Remove length variable
-                    line_memory_array.remove(line_memory_array[9])
+                    del line_memory_array[9]
 
                     #Join array into printable line, write to output.
                     printline = "\t".join(line_memory_array) + '\n'

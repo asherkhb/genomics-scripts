@@ -6,8 +6,8 @@ __author__ = 'asherkhb'
 from os import path
 from csv import reader
 
-input_seq = path.expanduser('~/Downloads/E1_Osativa_japonica_CDS.fasta')
-input_vcf = path.expanduser('~/Downloads/snp3kvars-loc_os02g05880.csv')  # Using CSV currently
+input_seq = path.expanduser('~/Dropbox/O.sativa_japonica_genomic.fasta')
+input_vcf = path.expanduser('~/Dropbox/snp3kvars-loc_os02g05880.csv')  # Using CSV currently
 otpt = 'output.fasta'
 ref = 'E1_O.sativa_japonica_CDS'
 start_loc = 2904357
@@ -49,5 +49,6 @@ with open(otpt, 'w') as out:
         conversion = ''.join(conversion) + '\n'
         out.write(heading)
         out.write(conversion)
-print "You had %s index errors. Not all SNPs were incorporated. Check out input reference sequence length!" % \
-      str(index_error_count)
+if index_error_count > 0:
+    print "You had %s index errors. Not all SNPs were incorporated. Check out input reference sequence length!" % \
+          str(index_error_count)
