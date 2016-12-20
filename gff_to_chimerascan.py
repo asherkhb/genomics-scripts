@@ -81,8 +81,8 @@ with open(args.gff, 'U') as gff:
         # GeneID | Chromosome | Strand | Tstart | Tstop | Mstart | Mstop | exonCount | exonStarts | exonEnds | geneSymbol
         info = genes[gene]
         eCount = len(info[4])
-        eStarts = ','.join([i[0] for i in info[4]])
-        eEnds = ','.join([i[1] for i in info[4]])
+        eStarts = ','.join([i[0] for i in info[4]]) + ','
+        eEnds = ','.join([i[1] for i in info[4]]) + ','
         components = [gene, info[0], info[1], info[2], info[3], info[2], info[3], eCount, eStarts, eEnds, gene]
         entry = '\t'.join([str(c) for c in components]) + '\n'
         output.write(entry)
